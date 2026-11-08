@@ -326,6 +326,7 @@ function sourcesCard(data) {
   const chip = s => s.status === 'ok' ? '<span class="chip ok"><span class="dot"></span>Up to date</span>'
     : s.status === 'syncing' ? '<span class="chip info pulse"><span class="dot"></span>Updating</span>'
     : s.status === 'error' ? '<span class="chip bad"><span class="dot"></span>Needs attention</span>'
+    : s.status === 'demo' ? '<span class="chip info"><span class="dot"></span>Demo data</span>'
     : '<span class="chip warn"><span class="dot"></span>Connecting</span>';
   return `<section class="card">
     <h2>Connected accounts</h2>
@@ -472,7 +473,7 @@ async function renderAdminClient(id) {
           <tbody>${d.sources.map(s => `<tr>
             <td>${esc(PLATFORM_NAMES[s.platform] || s.platform)}</td>
             <td>${esc(s.label)}<br><span class="muted small mono">${esc(s.external_id)}</span></td>
-            <td>${s.status === 'error' ? `<span class="chip bad">Error</span><div class="error small" style="margin-top:4px">${esc(s.last_error)}</div>` : `<span class="chip ${s.status === 'ok' ? 'ok' : 'info'}">${{ ok: 'Up to date', syncing: 'Syncing', pending: 'Waiting' }[s.status] || esc(s.status)}</span>`}</td>
+            <td>${s.status === 'error' ? `<span class="chip bad">Error</span><div class="error small" style="margin-top:4px">${esc(s.last_error)}</div>` : `<span class="chip ${s.status === 'ok' ? 'ok' : 'info'}">${{ ok: 'Up to date', syncing: 'Syncing', pending: 'Waiting', demo: 'Demo data' }[s.status] || esc(s.status)}</span>`}</td>
             <td class="small">${s.last_synced_at ? ago(s.last_synced_at) : '—'}${s.data_through ? `<br><span class="muted">through ${fmtDate(s.data_through.slice(0, 10))}</span>` : ''}</td>
             <td class="num"><button class="btn sm danger" data-del-source="${s.id}">Remove</button></td>
           </tr>`).join('')}</tbody></table></div>` : '<p class="muted">No accounts mapped yet.</p>'}

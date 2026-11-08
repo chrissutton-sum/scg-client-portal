@@ -164,7 +164,7 @@ app.get('/api/dashboard', wrap(async (req, res) => {
                                      from sources where client_id = $1 order by platform, label`, [clientId]);
 
   // Refresh in the background when the data is getting old, so a viewer never waits on it
-  const stale = sources.some(s => s.status !== 'syncing' && (!s.last_synced_at || Date.now() - s.last_synced_at > STALE_HOURS * 3600e3));
+  const stale = sources.some(s => !['syncing', 'demo'].includes(s.status) && (!s.last_synced_at || Date.now() - s.last_synced_at > STALE_HOURS * 3600e3));
   if (stale && !process.env.DEMO_MODE) syncClient(clientId).catch(e => console.error('[sync]', e.message));
 
   const period = resolvePeriod(req.query.range, req.query.start, req.query.end, client.timezone);
@@ -389,6 +389,8 @@ if (require.main === module) {
   migrate().then(bootstrapAdmin).then(() => {
     const port = process.env.PORT || 3000;
     app.listen(port, () => console.log(`SCG Client Portal on :${port}`));
+    // Demo clients for previewing before real accounts connect. Reseeded each start so dates stay current.
+    if (process.env.SEED_DEMO) require('./seed-demo').seedDemo().catch(e => console.error('[demo]', e.message));
     if (process.env.SYNC_EVERY_HOURS && !process.env.DEMO_MODE) {
       setInterval(() => syncAll().catch(e => console.error('[sync]', e.message)), Number(process.env.SYNC_EVERY_HOURS) * 3600e3);
     }

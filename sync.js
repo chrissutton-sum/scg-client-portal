@@ -15,7 +15,7 @@ async function syncSource(sourceId) {
   // Claim the source so two syncs never run on it at once (stale claims expire after 30 min)
   const { rows: [src] } = await q(`
     update sources s set status = 'syncing', sync_started_at = now()
-    from clients c where s.id = $1 and c.id = s.client_id
+    from clients c where s.id = $1 and c.id = s.client_id and s.status <> 'demo'
       and (s.status <> 'syncing' or s.sync_started_at < now() - interval '30 minutes')
     returning s.*, c.timezone`, [sourceId]);
   if (!src) return { skipped: true };

@@ -73,24 +73,26 @@ const CLIENTS = [
   },
 ];
 
-async function main() {
-  await migrate();
-  await q(`delete from clients where name = any($1)`, [CLIENTS.map(c => c.name)]);
+// withLogins: create the demo logins with a known password. Local testing only, never on the live site.
+async function seedDemo({ withLogins = false } = {}) {
+  await q(`delete from clients where name = any($1)`, [CLIENTS.flatMap(c => [c.name, `${c.name} (Demo)`])]);
 
-  const hash = await bcrypt.hash('demo-password-1', 12);
-  await q(`insert into users (email, name, password_hash, role, must_change_password) values ('admin@scg.demo', 'Summit Admin', $1, 'admin', false)
+  const hash = withLogins && await bcrypt.hash('demo-password-1', 12);
+  if (withLogins) await q(`insert into users (email, name, password_hash, role, must_change_password) values ('admin@scg.demo', 'Summit Admin', $1, 'admin', false)
            on conflict (email) do nothing`, [hash]);
 
   for (const c of CLIENTS) {
-    const { rows: [client] } = await q(`insert into clients (name) values ($1) returning id`, [c.name]);
-    await q(`delete from users where email = $1`, [c.login]);
-    await q(`insert into users (email, name, password_hash, role, client_id, must_change_password, last_login_at)
-             values ($1, $2, $3, 'client', $4, false, now() - interval '2 days')`, [c.login, c.person, hash, client.id]);
+    const { rows: [client] } = await q(`insert into clients (name) values ($1) returning id`, [`${c.name}${withLogins ? '' : ' (Demo)'}`]);
+    if (withLogins) {
+      await q(`delete from users where email = $1`, [c.login]);
+      await q(`insert into users (email, name, password_hash, role, client_id, must_change_password, last_login_at)
+               values ($1, $2, $3, 'client', $4, false, now() - interval '2 days')`, [c.login, c.person, hash, client.id]);
+    }
 
     const ids = {};
     for (const [platform, [ext, label]] of Object.entries(c.sources)) {
       const { rows: [s] } = await q(`insert into sources (client_id, platform, external_id, label, status, last_synced_at, data_through)
-        values ($1, $2, $3, $4, 'ok', now() - interval '47 minutes', $5) returning id`, [client.id, platform, ext, label, END]);
+        values ($1, $2, $3, $4, 'demo', now() - interval '47 minutes', $5) returning id`, [client.id, platform, ext, label, END]);
       ids[platform] = s.id;
     }
 
@@ -119,9 +121,14 @@ async function main() {
     for (const [ago, title, body] of c.notes) {
       await q(`insert into notes (client_id, date, title, body) values ($1, $2, $3, $4)`, [client.id, addDays(END, -ago), title, body]);
     }
-    console.log(`Seeded ${c.name}: ${rows.s.length} data points, login ${c.login}`);
+    console.log(`Seeded ${c.name}: ${rows.s.length} data points${withLogins ? `, login ${c.login}` : ''}`);
   }
-  console.log('Admin login: admin@scg.demo / demo-password-1 (client logins use the same password)');
+  if (withLogins) console.log('Admin login: admin@scg.demo / demo-password-1 (client logins use the same password)');
 }
 
-main().catch(e => { console.error(e); process.exitCode = 1; }).finally(() => pool.end());
+module.exports = { seedDemo };
+
+if (require.main === module) {
+  migrate().then(() => seedDemo({ withLogins: true }))
+    .catch(e => { console.error(e); process.exitCode = 1; }).finally(() => pool.end());
+}
