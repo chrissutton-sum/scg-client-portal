@@ -1,0 +1,27 @@
+{
+  "name": "scg-client-portal",
+  "version": "1.0.0",
+  "description": "SCG Client Portal: secure per-client marketing dashboards",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "sync": "node sync.js",
+    "seed-demo": "node seed-demo.js",
+    "test": "node --test test/*.test.js"
+  },
+  "license": "UNLICENSED",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "chart.js": "^4.6.1",
+    "connect-pg-simple": "^10.0.0",
+    "express": "^5.3.0",
+    "express-rate-limit": "^8.7.3",
+    "express-session": "^1.19.0",
+    "helmet": "^8.3.0",
+    "pg": "^8.23.1"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "private": true
+}
