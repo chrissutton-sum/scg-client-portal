@@ -29,11 +29,10 @@ Secure per-client marketing dashboards for Summit Creative Group clients. Each c
 | `APP_URL` | e.g. `https://scg-client-portal.onrender.com` (no trailing slash) |
 | `ADMIN_EMAIL`, `ADMIN_PASSWORD` | Creates the first admin on first start (must change password on sign-in) |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Google Cloud OAuth client |
-| `GOOGLE_ADS_DEVELOPER_TOKEN` | From the manager account's API Center |
-| `GOOGLE_ADS_LOGIN_CUSTOMER_ID` | Summit's manager (MCC) account ID |
+| `GOOGLE_ADS_LOGIN_CUSTOMER_ID` | Summit's manager (MCC) account ID. Optional; without it the app lists ad accounts the Google login can open directly |
 | `META_APP_ID`, `META_APP_SECRET` | Meta developer app |
 | `META_SYSTEM_USER_TOKEN` | Optional, recommended: never-expiring token from Business Manager |
-| `GOOGLE_ADS_API_VERSION`, `META_API_VERSION` | Optional, default `v21` / `v24.0` |
+| `GOOGLE_ADS_API_VERSION`, `META_API_VERSION` | Optional, default `v26` / `v24.0` |
 | `STALE_HOURS`, `SYNC_EVERY_HOURS` | Optional sync tuning |
 
 ## Platform setup (one time)
@@ -46,9 +45,9 @@ These approvals take anywhere from a day to a few weeks, so start them first.
 3. OAuth consent screen: External, add the scopes the app asks for, then **Publish to production**. Leaving it in "Testing" makes the login expire every 7 days. Since only Summit staff sign in through it, Google's unverified-app warning is fine to click through.
 4. Credentials → OAuth client ID → Web application. Authorized redirect URI: `{APP_URL}/oauth/google/callback`.
 
-**Google Ads:** In the Summit manager account, Tools → API Center, request a developer token and apply for **Basic access** (test access only reads test accounts).
+**Google Ads:** Developer tokens were retired in September 2026; access now belongs to the Cloud project. In the same project, open the Google Ads API Overview page (console.cloud.google.com/google/ads-apis/overview) and apply for **Explorer access** (usually approved automatically, 2,880 operations/day, plenty for daily syncs). Basic access needs brand verification and a paid-tier billing account. Don't use the old API Center in Google Ads.
 
-**Business Profile:** Request API access using Google's Business Profile API access form. Until it's approved the quota is 0 and those calls fail.
+**Business Profile:** Submit support.google.com/business/contact/api_default with the Cloud **project number**. Needs a verified Business Profile active 60+ days and a business website. Manual review, days to a few weeks. Until approved the quota is 0 and those calls fail.
 
 **Meta** (developers.facebook.com)
 1. Create a Business-type app connected to Summit's Business Manager, add Facebook Login for Business.

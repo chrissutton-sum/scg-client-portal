@@ -618,7 +618,7 @@ async function renderConnections(params) {
           ${conn.google.account ? `<p style="margin:0">Signed in as <b>${esc(conn.google.account)}</b></p>` : ''}
           <ul class="small" style="list-style:none;padding:0;margin:0;display:grid;gap:6px">
             ${check(conn.google.configured, 'OAuth client ID and secret')}
-            ${check(conn.google.adsReady, 'Google Ads developer token and manager account ID')}
+            ${check(conn.google.adsReady, 'Google Ads manager account ID (optional, needed to reach client ad accounts through your manager account)')}
           </ul>
           <div><a class="btn ${conn.google.connected ? '' : 'primary'}" href="/oauth/google/start" ${conn.google.configured ? '' : 'aria-disabled="true" style="pointer-events:none;opacity:.5"'}>${conn.google.connected ? 'Reconnect Google' : 'Connect Google'}</a></div>
         </section>

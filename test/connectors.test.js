@@ -40,8 +40,7 @@ test('Search Console stores weighted position', async () => {
   assert.ok(responses[0].seen.url.includes(encodeURIComponent('sc-domain:x.com')));
 });
 
-test('Google Ads converts micros and sends developer token', async () => {
-  process.env.GOOGLE_ADS_DEVELOPER_TOKEN = 'dev';
+test('Google Ads converts micros and sends the manager account ID', async () => {
   process.env.GOOGLE_ADS_LOGIN_CUSTOMER_ID = '123-456-7890';
   respond([{ match: 'googleAds:search', body: { results: [{ segments: { date: '2026-11-05' }, metrics: { costMicros: '42500000', clicks: '17', impressions: '300', conversions: 2.5, conversionsValue: 900 } }] } }]);
   const rows = await google.fetchers.google_ads('555-111-2222', '2026-11-01', '2026-11-06');
@@ -49,6 +48,18 @@ test('Google Ads converts micros and sends developer token', async () => {
   assert.equal(pick(rows, '2026-11-05', 'conversions'), 2.5);
   assert.ok(responses[0].seen.url.includes('/customers/5551112222/'));
   assert.equal(responses[0].seen.opts.headers['login-customer-id'], '1234567890');
+  assert.ok(!('developer-token' in responses[0].seen.opts.headers));
+});
+
+test('Google Ads discovery without a manager account lists directly accessible accounts', async () => {
+  delete process.env.GOOGLE_ADS_LOGIN_CUSTOMER_ID;
+  respond([
+    { match: 'listAccessibleCustomers', body: { resourceNames: ['customers/111'] } },
+    { match: 'customers/111/googleAds:search', body: { results: [{ customer: { id: '111', descriptiveName: 'Acme', manager: false } }] } },
+    { match: 'analyticsadmin', body: {} }, { match: 'webmasters', body: {} }, { match: 'mybusinessaccountmanagement', body: {} },
+  ]);
+  const d = await google.discover();
+  assert.deepEqual(d.google_ads, [{ id: '111', label: 'Acme (111)' }]);
 });
 
 test('Business Profile sums the four impression types into views', async () => {

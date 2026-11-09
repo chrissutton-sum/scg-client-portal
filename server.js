@@ -323,7 +323,7 @@ admin.get('/connections', wrap(async (req, res) => {
   const env = k => Boolean(process.env[k]);
   res.json({
     google: { connected: !!g, account: g?.account_name, configured: env('GOOGLE_CLIENT_ID') && env('GOOGLE_CLIENT_SECRET'),
-      adsReady: env('GOOGLE_ADS_DEVELOPER_TOKEN') && env('GOOGLE_ADS_LOGIN_CUSTOMER_ID') },
+      adsReady: env('GOOGLE_ADS_LOGIN_CUSTOMER_ID') },
     meta: { ...(await meta.status()), configured: env('META_APP_ID') && env('META_APP_SECRET') },
   });
 }));

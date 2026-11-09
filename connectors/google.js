@@ -9,7 +9,7 @@ const SCOPES = [
   'https://www.googleapis.com/auth/adwords',
   'https://www.googleapis.com/auth/business.manage',
 ];
-const ADS_VERSION = process.env.GOOGLE_ADS_API_VERSION || 'v21';
+const ADS_VERSION = process.env.GOOGLE_ADS_API_VERSION || 'v26';
 const redirectUri = () => `${process.env.APP_URL}/oauth/google/callback`;
 
 function authUrl(state) {
@@ -65,17 +65,17 @@ async function api(url, { method = 'GET', body, headers = {} } = {}) {
   return data;
 }
 
-const adsHeaders = () => ({
-  'developer-token': process.env.GOOGLE_ADS_DEVELOPER_TOKEN,
-  ...(process.env.GOOGLE_ADS_LOGIN_CUSTOMER_ID && { 'login-customer-id': process.env.GOOGLE_ADS_LOGIN_CUSTOMER_ID.replace(/-/g, '') }),
-});
+// Since Sept 2026, Ads API access comes from the Cloud project, so no developer token is needed.
+// The manager (MCC) ID is only needed to reach client accounts through Summit's manager account.
+const mccId = () => (process.env.GOOGLE_ADS_LOGIN_CUSTOMER_ID || '').replace(/-/g, '');
+const adsHeaders = (loginId = mccId()) => (loginId ? { 'login-customer-id': loginId } : {});
 
-async function adsSearch(customerId, query) {
+async function adsSearch(customerId, query, loginId) {
   const rows = [];
   let pageToken;
   do {
     const data = await api(`https://googleads.googleapis.com/${ADS_VERSION}/customers/${customerId}/googleAds:search`,
-      { method: 'POST', headers: adsHeaders(), body: { query, ...(pageToken && { pageToken }) } });
+      { method: 'POST', headers: adsHeaders(loginId), body: { query, ...(pageToken && { pageToken }) } });
     rows.push(...(data.results || []));
     pageToken = data.nextPageToken;
   } while (pageToken);
@@ -98,12 +98,21 @@ async function discover() {
     return (d.siteEntry || []).filter(s => s.permissionLevel !== 'siteUnverifiedUser').map(s => ({ id: s.siteUrl, label: s.siteUrl }));
   });
   await tryIt('google_ads', async () => {
-    const mcc = (process.env.GOOGLE_ADS_LOGIN_CUSTOMER_ID || '').replace(/-/g, '');
-    if (!mcc) throw new Error('Set GOOGLE_ADS_LOGIN_CUSTOMER_ID (your manager account ID)');
-    const rows = await adsSearch(mcc, `SELECT customer_client.id, customer_client.descriptive_name, customer_client.manager
-      FROM customer_client WHERE customer_client.level <= 1`);
-    return rows.filter(r => !r.customerClient.manager)
-      .map(r => ({ id: String(r.customerClient.id), label: `${r.customerClient.descriptiveName || 'Unnamed'} (${r.customerClient.id})` }));
+    const label = c => `${c.descriptiveName || 'Unnamed'} (${c.id})`;
+    if (mccId()) {
+      const rows = await adsSearch(mccId(), `SELECT customer_client.id, customer_client.descriptive_name, customer_client.manager
+        FROM customer_client WHERE customer_client.level <= 1`);
+      return rows.filter(r => !r.customerClient.manager).map(r => ({ id: String(r.customerClient.id), label: label(r.customerClient) }));
+    }
+    // No manager account: list the ad accounts the Google login can open directly
+    const { resourceNames = [] } = await api(`https://googleads.googleapis.com/${ADS_VERSION}/customers:listAccessibleCustomers`);
+    const list = [];
+    for (const name of resourceNames) {
+      const id = name.split('/')[1];
+      const [r] = await adsSearch(id, 'SELECT customer.id, customer.descriptive_name, customer.manager FROM customer', '').catch(() => []);
+      if (r && !r.customer.manager) list.push({ id, label: label(r.customer) });
+    }
+    return list;
   });
   await tryIt('gbp', async () => {
     const accts = await api('https://mybusinessaccountmanagement.googleapis.com/v1/accounts');
