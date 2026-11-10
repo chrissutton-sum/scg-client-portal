@@ -63,7 +63,7 @@ function ago(iso) {
   return `${Math.round(hrs / 24)} days ago`;
 }
 
-const LOGO = `<span class="logo"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M4 52 25 18l9 15 7-9 19 28Z" fill="#fff"/><path d="M25 18l-5 8 5-2 4 4Z" fill="#38bdf8"/></svg></span>`;
+const LOGO = `<img class="logo" src="/logo.png" alt="SCG">`;
 
 // ---------- shell
 
@@ -371,7 +371,7 @@ function drawChart(section, data) {
 
   const datasets = [{
     label: fmtRange(data.period.start, data.period.end), data: c.points.map(p => p.value),
-    borderColor: color('--accent'), backgroundColor: 'rgba(56,189,248,.08)', fill: true,
+    borderColor: color('--accent'), backgroundColor: 'rgba(0,224,245,.08)', fill: true,
     borderWidth: 2, pointRadius: 0, pointHoverRadius: 5, pointHoverBorderWidth: 2, pointHoverBorderColor: color('--card'), cubicInterpolationMode: 'monotone',
   }];
   if (data.compare) datasets.push({

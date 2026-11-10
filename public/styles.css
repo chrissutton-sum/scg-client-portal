@@ -1,8 +1,8 @@
 /* SCG app family palette (matches SCG CRM / Business Audit / Connect) */
 :root {
-  --bg: #070b12; --surface: #101726; --card: #162033; --sunk: #0b101b;
-  --ink: #f1f5f9; --muted: #94a3b8; --faint: #64748b; --line: #283754; --grid: rgba(148, 163, 184, .12);
-  --accent: #38bdf8; --blue: #2563eb; --accent-soft: rgba(56, 189, 248, .12);
+  --bg: #000b19; --surface: #001630; --card: #0a2649; --sunk: #000f22;
+  --ink: #e8ebf0; --muted: #9ca8b8; --faint: #6b7c92; --line: #1c3e68; --grid: rgba(156, 168, 184, .12);
+  --accent: #00e0f5; --blue: #0b74b8; --accent-soft: rgba(0, 224, 245, .12);
   --good: #10b981; --warn: #f59e0b; --bad: #ef4444;
   --good-soft: rgba(16, 185, 129, .15); --warn-soft: rgba(245, 158, 11, .15); --bad-soft: rgba(239, 68, 68, .15);
   --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
@@ -28,8 +28,8 @@ h3 { font-size: 15px; }
   background: var(--surface); border-bottom: 1px solid var(--line); border-top: 3px solid var(--blue); }
 .brand { display: flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 700; font-size: 17px; color: var(--ink); }
 .brand:hover { text-decoration: none; }
-.logo { width: 34px; height: 34px; border-radius: 8px; background: var(--blue); display: grid; place-items: center; }
-.logo svg { width: 22px; height: 22px; }
+.logo { height: 40px; width: auto; display: block; }
+.login .logo { height: 72px; }
 .brand small { display: block; font: 500 11px var(--body); color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
 .topbar .spacer { flex: 1; }
 .topbar nav { display: flex; gap: 4px; }
@@ -93,7 +93,7 @@ label.field { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
 .delta { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; padding: 1px 8px; border-radius: 6px; }
 .delta.good { background: var(--good-soft); color: var(--good); }
 .delta.bad { background: var(--bad-soft); color: var(--bad); }
-.delta.flat { background: rgba(148, 163, 184, .12); color: var(--muted); }
+.delta.flat { background: rgba(156, 168, 184, .12); color: var(--muted); }
 .kpi .vs { display: block; color: var(--faint); font-size: 12px; margin-top: 4px; }
 
 .chart-wrap { position: relative; height: 260px; }
@@ -149,8 +149,8 @@ tr:last-child td { border-bottom: 0; }
 
 /* Printed / PDF report: light, no controls */
 @media print {
-  :root { --bg: #fff; --surface: #fff; --card: #fff; --sunk: #f6f8fb; --ink: #0f172a; --muted: #475569; --faint: #64748b;
-    --line: #dbe3ee; --grid: rgba(15, 23, 42, .08); color-scheme: light; }
+  :root { --bg: #fff; --surface: #fff; --card: #fff; --sunk: #f6f8fb; --ink: #001630; --muted: #475569; --faint: #6b7c92;
+    --line: #dbe3ee; --grid: rgba(0, 22, 48, .08); color-scheme: light; }
   .topbar, .controls, .no-print, .chart-foot .linkbtn { display: none !important; }
   main { padding: 0; max-width: none; }
   .card { break-inside: avoid; border-radius: 8px; }
