@@ -367,6 +367,7 @@ for (const [name, provider] of Object.entries({ google, meta })) {
 // ---------- Static app
 
 app.get('/healthz', (req, res) => res.send('ok'));
+app.get('/download', (req, res) => res.sendFile(path.join(__dirname, 'public', 'download.html')));
 app.use(express.static(path.join(__dirname, 'public'), { index: 'index.html', maxAge: PROD ? '1h' : 0 }));
 app.get('/vendor/chart.umd.js', (req, res) => res.sendFile(path.join(__dirname, 'node_modules/chart.js/dist/chart.umd.js')));
 app.get(/^\/(?!api|oauth).*/, (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));

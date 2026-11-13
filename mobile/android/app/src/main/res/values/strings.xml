@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">SCG Client Portal</string>
+    <string name="title_activity_main">SCG Client Portal</string>
+    <string name="package_name">com.summitcreativegroup.portal</string>
+    <string name="custom_url_scheme">com.summitcreativegroup.portal</string>
+</resources>

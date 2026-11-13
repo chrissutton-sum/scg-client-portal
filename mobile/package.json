@@ -1,0 +1,21 @@
+{
+  "name": "scg-client-portal-mobile",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Android shell for SCG Client Portal",
+  "scripts": {
+    "sync:android": "cap sync android",
+    "sync:ios": "cap sync ios"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.6.0",
+    "@capacitor/app": "^8.1.2",
+    "@capacitor/browser": "^8.0.5",
+    "@capacitor/core": "^8.6.0",
+    "@capacitor/ios": "^8.6.0",
+    "@capacitor/push-notifications": "^8.1.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.6.0"
+  }
+}

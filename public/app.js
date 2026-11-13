@@ -102,6 +102,7 @@ function renderLogin(error = '') {
         <div class="error" id="err">${esc(error)}</div>
         <button class="btn primary" style="justify-content:center">Sign in</button>
         <p class="muted small" style="margin:0;text-align:center">Forgot your password? Contact your Summit account manager and we'll reset it.</p>
+        ${/Android/i.test(navigator.userAgent) && !Native.on ? `<p class="muted small" style="margin:0;text-align:center"><a href="/download">📱 Get the Android app</a></p>` : ''}
       </form>
     </div>`;
   document.getElementById('login').onsubmit = async e => {
@@ -147,7 +148,12 @@ function renderFirstPassword() {
 
 function renderAccount() {
   shell(`<h1 style="margin-bottom:20px">Account</h1>
-    <p class="muted">Signed in as <b>${esc(me.user.email)}</b></p>${passwordForm(false)}`, 'account');
+    <p class="muted">Signed in as <b>${esc(me.user.email)}</b></p>${passwordForm(false)}
+    ${Native.on ? '' : `<div class="card" style="max-width:440px;margin-top:20px">
+      <h2 style="margin:0 0 8px">Mobile app</h2>
+      <p class="muted small" style="margin:0 0 12px">Install SCG Client Portal on your Android phone — same sign-in as the web app.</p>
+      <a class="btn" href="/download">📱 Get the Android app</a>
+    </div>`}`, 'account');
   bindPasswordForm(() => { toast('Password updated'); renderAccount(); });
 }
 
@@ -682,5 +688,6 @@ async function start() {
   route();
 }
 
+Native.start();
 window.addEventListener('hashchange', route);
 start();

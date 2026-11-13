@@ -1,0 +1,27 @@
+{
+  "appId": "com.summitcreativegroup.portal",
+  "appName": "SCG Client Portal",
+  "webDir": "www",
+  "backgroundColor": "#000b19",
+  "server": {
+    "url": "https://scg-client-portal.onrender.com",
+    "errorPath": "index.html"
+  },
+  "android": {
+    "allowMixedContent": false
+  },
+  "plugins": {
+    "SystemBars": {
+      "insetsHandling": "native",
+      "style": "DARK",
+      "initialViewportFitValueHint": "cover"
+    },
+    "PushNotifications": {
+      "presentationOptions": [
+        "badge",
+        "sound",
+        "alert"
+      ]
+    }
+  }
+}
